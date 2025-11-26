@@ -39,10 +39,10 @@ class Sky(Scene):
         yAxis.set_z_index(-1)
 
         #Crea un plano para mostrar los resultados
-        plane = NumberPlane(x_range=[0,10], x_length=6, y_range=[0,6], y_length=4, background_line_style={"stroke_opacity": 1}).to_edge(RIGHT)
+        plane = NumberPlane(x_range=[400,700,50], x_length=6, y_range=[0,100,20], y_length=4, background_line_style={"stroke_opacity": 1}).to_edge(RIGHT)
 
         #Muestra el marco de coordenadas y el plano en el escenario
-        self.play(Create(xAxis), Create(yAxis), Rotate(sun, -PI/6, about_point=target.get_center()), DrawBorderThenFill(plane), run_time=3)
+        self.play(Create(xAxis), Create(yAxis), Rotate(sun, -PI/4, about_point=target.get_center()), DrawBorderThenFill(plane), run_time=3)
         self.wait()
 
         #Genera el angulo entre la tangente de la tierra y el sol
@@ -50,11 +50,24 @@ class Sky(Scene):
         symbol = always_redraw(lambda: MathTex(r"\alpha").next_to(angle).scale(0.9))
         alpha = always_redraw(lambda: MathTex(r"\alpha = " + f"{self.getAngle(light,xAxis)*180/PI:.2f}^\circ").to_edge(DOWN).scale(1))
 
+        #Calcula la intensidad en funcion de la longitud de onda y el angulo
+        graf = always_redraw(lambda: plane.plot(lambda x: self.getIntensity(x,self.getAngle(light,xAxis)), x_range=[400,700], color=WHITE))
+        #Genera los colores para seguir de forma mas sencilla el sistema
+        rainbow = ["#e81416", "#ffa500","#faeb36","#79c314", "#487de7", "#4b369d","#70369d"]
+        colors = always_redraw(lambda:plane.get_riemann_rectangles(graf, x_range=[400,700], dx=10,color=rainbow))
+
         #Muestra el angulo en pantalla
-        self.play(Create(angle), Create(symbol), Create(alpha))
-        self.play( Rotate(sun, -PI/6, about_point=target.get_center()), run_time=3)
+        self.play(Create(angle), Create(symbol), Create(alpha), Create(graf), Create(colors),run_time=3)
+        self.play(Rotate(sun, -2*PI/9, about_point=target.get_center()), run_time=3)
         self.wait()
         
+        #Gira el sol para mostrar la dependencia de la intensidad de este
+        #self.play(Rotate(sun, PI/6, about_point=target.get_center()), run_time=3)
+        self.play(Rotate(sun, 17*PI/36, about_point=target.get_center()), run_time=6)
+        self.wait()
+        self.play(Rotate(sun, -17*PI/36, about_point=target.get_center()), run_time=6)
+        self.wait()
+
 
     #Funcion que obtiene el angulo en grados entre 2 lineas
     def getAngle(self,l1,l2):
@@ -66,11 +79,21 @@ class Sky(Scene):
 
 
     def getIntensity(self,wavelength, angle):
-        pass
+        #Ajusta la longitud de onda a su valor en nanometros
+        wl = wavelength * 1e-9
+
+        #Calcula la intensidad maxima
+        intensityMax = 2 / (np.power(400 * 1e-9,4))
+
+        #Calcula la intensidad para el caso especifico
+        intensity = (1 + np.power(np.cos((np.pi/2) - angle),2)) / np.power(wl,4)
+
+        #Retorna un porcentaje de  I / Imax
+        return 100 * (intensity/ intensityMax)
 
 
 
 
 
-        self.wait()
+        
 
