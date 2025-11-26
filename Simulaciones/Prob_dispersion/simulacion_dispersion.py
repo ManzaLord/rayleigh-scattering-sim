@@ -24,17 +24,9 @@ class Escena(Scene):
         self.remove(luz_incidente)
         self.play(Create(onda)) 
         self.play(onda.animate.move_to(particula.get_center()).scale(0))
-        
-        coordenadas = PolarPlane(radius_max=6.0,size=5.8,
-            make_smooth_after_applying_functions=True,).add_coordinates()
-        
-        coordenadas.set_color(WHITE)
-        self.add(coordenadas)
-        self.bring_to_front(particula)
+       
         self.play(particula_text.animate.become(Text("Dispersion de Rayleigh").to_edge(UP)))
         self.wait(1)
-        self.bring_to_front(particula_text)
-        self.bring_to_front(particula)
 
         long_onda = np.array([450*1e-9,533*1e-9,575*1e-9,600*1e-9,700*1e-9])
         angulos = np.arange(0,2*PI,PI/10)
@@ -74,9 +66,9 @@ class Escena(Scene):
             dispersion.add(crear_vector(r, angulos, color))
         
         self.bring_to_front(particula_text)
-        self.play(Create(dispersion), run_time=5)
+        self.play(GrowFromCenter(dispersion), run_time=5)
         self.bring_to_front(particula_text)
-        self.play(ApplyWave(dispersion),run_time=5)
+        #self.play(ApplyWave(dispersion),run_time=5)
 
 
 #self.play(particula_text.animate.move_to([-5,2,0]).scale(0.5))
