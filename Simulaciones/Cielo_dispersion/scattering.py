@@ -49,9 +49,14 @@ class Sky(Scene):
 
         #Crea un plano para mostrar los resultados
         plane = NumberPlane(x_range=[400,700,50], x_length=6, y_range=[0,100,20], y_length=4, background_line_style={"stroke_opacity": 1}).to_edge(RIGHT).add_coordinates()
-        labels = plane.get_axis_labels(x_label=r"\lambda (nm)",y_label=r"I/I_0 (\%)")
+
+        #Nombres en los ejes
+        xLabel = MathTex(r"\lambda (nm)").scale(0.4).move_to(RIGHT*6.7+DOWN*1)
+        yLabel = MathTex(r"I/I_0 (\%)").to_edge(UP).scale(0.4)
+        labels = Group(xLabel,yLabel)
+
         #Muestra el marco de coordenadas y el plano en el escenario
-        self.play(Create(xAxis), Create(yAxis), Rotate(sun, -PI/4, about_point=target.get_center()), DrawBorderThenFill(plane),FadeIn(labels), run_time=3)
+        self.play(Create(xAxis), Create(yAxis), Rotate(sun, -PI/4, about_point=target.get_center()), DrawBorderThenFill(plane), run_time=3)
         self.wait()
 
         #Genera el angulo entre la tangente de la tierra y el sol
@@ -63,20 +68,19 @@ class Sky(Scene):
         graf = always_redraw(lambda: plane.plot(lambda x: self.getIntensity(x,self.getAngle(light,xAxis)), x_range=[400,700], color=WHITE))
 
         #Genera los colores para seguir de forma mas sencilla el sistema
-        rainbow = ["#70369d", "#4b369d", "#487de7", "#79c314", "#faeb36", "#ffa500", "#e81416"]
-        colors = always_redraw(lambda:plane.get_riemann_rectangles(graf, x_range=[400,700], dx=20,color=rainbow))
+        rainbow = ["#4b369d", "#487de7", "#79c314", "#faeb36", "#ffa500", "#e81416"]
+        colors = always_redraw(lambda:plane.get_riemann_rectangles(graf, x_range=[400,700], dx=5,color=rainbow))
 
         #Junta las partes del grafico para moverlo en conjunto
-        graphicGroup = Group(plane,labels,colors)
+        graphicGroup = Group(plane,colors)
 
         #Muestra el angulo en pantalla
         self.play(Create(angle), Create(symbol), Create(alpha), Create(colors),run_time=4)
-        self.play(graphicGroup.animate.to_edge(UP),run_time= 3)
+        self.play(graphicGroup.animate.to_edge(UP),FadeIn(labels),run_time= 3)
         self.play(Rotate(sun, -2*PI/9, about_point=target.get_center()), run_time=3)
         self.wait()
         
         #Gira el sol para mostrar la dependencia de la intensidad de este
-        #self.play(Rotate(sun, PI/6, about_point=target.get_center()), run_time=3)
         self.play(Rotate(sun, 17*PI/36, about_point=target.get_center()), run_time=6)
         self.wait()
         self.play(Rotate(sun, -17*PI/36, about_point=target.get_center()), run_time=6)
