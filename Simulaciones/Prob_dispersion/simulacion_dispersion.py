@@ -19,7 +19,7 @@ class Escena(Scene):
             t_range=[-1, 8],
             color=WHITE
         ).to_edge(LEFT)
-        nuevo_texto = MathTex("\\text{Rayo del sol} \\lambda >> \\text{partícula}") # texto
+        nuevo_texto = MathTex("text{Rayo de Sol} \\hspace{1cm}","\\lambda >> \\text{partícula}") # texto
         nuevo_texto.next_to(onda, UP*1) # muevo el texto arriba de la onda
 
         # transforma el texto de la particula en el del rayo del sol 
